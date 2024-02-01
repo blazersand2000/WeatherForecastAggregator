@@ -1,3 +1,7 @@
+using WeatherForecastAggregator.App.Mappings;
+using WeatherForecastAggregator.App.Services;
+using WeatherForecastAggregator.Domain.Interfaces;
+
 namespace WeatherForecastAggregator
 {
    public class Program
@@ -7,6 +11,9 @@ namespace WeatherForecastAggregator
          var builder = WebApplication.CreateBuilder(args);
 
          // Add services to the container.
+         ConfigureServices(builder.Services);
+
+         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 
          builder.Services.AddControllers();
          // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -30,6 +37,11 @@ namespace WeatherForecastAggregator
          app.MapControllers();
 
          app.Run();
+      }
+
+      static void ConfigureServices(IServiceCollection services)
+      {
+         services.AddSingleton<IForecastService, ForecastService>();
       }
    }
 }

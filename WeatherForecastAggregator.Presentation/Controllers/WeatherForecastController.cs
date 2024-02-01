@@ -1,33 +1,37 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using WeatherForecastAggregator.App.DTOs.Requests;
+using WeatherForecastAggregator.Domain.Interfaces;
+using WeatherForecastAggregator.Domain.Models;
 
 namespace WeatherForecastAggregator.Controllers
 {
    [ApiController]
-   [Route("[controller]")]
+   [Route("api/[controller]")]
    public class WeatherForecastController : ControllerBase
    {
-      private static readonly string[] Summaries = new[]
-      {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
+      private readonly IForecastService _forecastService;
+      private readonly IMapper _mapper;
       private readonly ILogger<WeatherForecastController> _logger;
 
-      public WeatherForecastController(ILogger<WeatherForecastController> logger)
+      public WeatherForecastController(IForecastService forecastService, IMapper mapper, ILogger<WeatherForecastController> logger)
       {
+         _forecastService = forecastService;
+         _mapper = mapper;
          _logger = logger;
       }
 
-      [HttpGet(Name = "GetWeatherForecast")]
-      public IEnumerable<WeatherForecast> Get()
+      [HttpGet]
+      public async Task<AggregatedForecastDto> Get(string location)
       {
-         return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-         {
-            Date = DateTime.Now.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-         })
-         .ToArray();
+         var requestDto = new ForecastsRequestDto { Location = location };
+         var request = _mapper.Map<ForecastsRequest>(requestDto);
+
+         var forecasts = _forecastService.GetForecasts(request);
+
+         var responseDto = _mapper.Map<AggregatedForecastDto>(forecasts);
+
+         return responseDto;
       }
    }
 }
