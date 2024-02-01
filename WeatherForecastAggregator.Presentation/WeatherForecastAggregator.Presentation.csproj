@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>cdcd374f-7526-4ace-8792-f2cd6ea468cb</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WeatherForecastAggregator.App\WeatherForecastAggregator.App.csproj" />
     <ProjectReference Include="..\WeatherForecastAggregator.Domain\WeatherForecastAggregator.Domain.csproj" />
+    <ProjectReference Include="..\WeatherForecastAggregator.Infrastructure\WeatherForecastAggregator.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

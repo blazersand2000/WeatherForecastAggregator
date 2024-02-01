@@ -27,7 +27,7 @@ namespace WeatherForecastAggregator.Controllers
          var requestDto = new ForecastsRequestDto { Location = location };
          var request = _mapper.Map<ForecastsRequest>(requestDto);
 
-         var forecasts = _forecastService.GetForecasts(request);
+         var forecasts = await _forecastService.GetForecasts(request);
 
          var responseDto = _mapper.Map<AggregatedForecastDto>(forecasts);
 

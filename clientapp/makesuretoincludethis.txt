@@ -1,0 +1,10 @@
+    https://www.microsoft.com/en-us/maps/bing-maps/product
+    
+    <footer>
+      <p>
+        This application uses services from 
+        <a href="https://www.microsoft.com/en-us/maps/product" target="_blank">Bing Maps</a>. 
+        Please review their 
+        <a href="https://www.microsoft.com/en-us/servicesagreement/" target="_blank">Terms of Use</a>.
+      </p>
+    </footer>
