@@ -25,6 +25,12 @@ namespace WeatherForecastAggregator
             client.BaseAddress = new Uri(builder.Configuration["BingMaps:BaseAddress"]);
          });
 
+         builder.Services.AddHttpClient<IForecastService, NationalWeatherService>(client =>
+         {
+            client.BaseAddress = new Uri("https://api.weather.gov");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("WeatherForecastAggregator");
+         });
+
          builder.Services.AddControllers();
          // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
          builder.Services.AddEndpointsApiExplorer();
@@ -51,8 +57,8 @@ namespace WeatherForecastAggregator
 
       static void ConfigureServices(IServiceCollection services)
       {
-         services.AddSingleton<IForecastService, ForecastService>();
-         //services.AddSingleton<IGeocodeService, BingMapsLocationsService>();
+         services.AddSingleton<IWeatherAggregatorService, WeatherAggregatorService>();
+         //services.AddSingleton<IForecastService, NationalWeatherService>();
       }
    }
 }

@@ -10,11 +10,11 @@ namespace WeatherForecastAggregator.Controllers
    [Route("api/[controller]")]
    public class WeatherForecastController : ControllerBase
    {
-      private readonly IForecastService _forecastService;
+      private readonly IWeatherAggregatorService _forecastService;
       private readonly IMapper _mapper;
       private readonly ILogger<WeatherForecastController> _logger;
 
-      public WeatherForecastController(IForecastService forecastService, IMapper mapper, ILogger<WeatherForecastController> logger)
+      public WeatherForecastController(IWeatherAggregatorService forecastService, IMapper mapper, ILogger<WeatherForecastController> logger)
       {
          _forecastService = forecastService;
          _mapper = mapper;
