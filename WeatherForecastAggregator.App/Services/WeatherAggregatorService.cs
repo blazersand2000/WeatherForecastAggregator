@@ -6,34 +6,28 @@ namespace WeatherForecastAggregator.App.Services
    public class WeatherAggregatorService : IWeatherAggregatorService
    {
       private readonly IGeocodeService _geocodeService;
-      private readonly IForecastService _forecastService;
+      private readonly IEnumerable<IForecastService> _forecastServices;
 
-      public WeatherAggregatorService(IGeocodeService geocodeService, IForecastService forecastService)
+      public WeatherAggregatorService(IGeocodeService geocodeService, IEnumerable<IForecastService> forecastServices)
       {
          _geocodeService = geocodeService;
-         _forecastService = forecastService;
+         _forecastServices = forecastServices;
       }
 
       public async Task<AggregatedForecast> GetForecasts(ForecastsRequest request)
       {
          var location = await _geocodeService.Geocode(request.Location);
-         var forecast = await _forecastService.GetForecast(location.Coordinates);
+         var forecastTasks = _forecastServices.Select(fs => fs.GetForecast(location.Coordinates));
+         var forecasts = await Task.WhenAll(forecastTasks);
+         var sources = forecasts.Select(f => new ForecastSource
+         {
+            Name = f,
+            CurrentTemperatureF = 69
+         });
          return new AggregatedForecast
          {
             Location = location.Name,
-            Sources = new[]
-            {
-               new ForecastSource
-               {
-                  Name = $"National Weather Service - {forecast}",
-                  CurrentTemperatureF = 75
-               },
-               new ForecastSource
-               {
-                  Name = "WeatherSource2",
-                  CurrentTemperatureF = 78
-               }
-            }
+            Sources = sources
          };
       }
    }

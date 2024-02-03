@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using WeatherForecastAggregator.App.Mappings;
 using WeatherForecastAggregator.App.Services;
 using WeatherForecastAggregator.Domain.Interfaces;
@@ -13,23 +14,14 @@ namespace WeatherForecastAggregator
          var builder = WebApplication.CreateBuilder(args);
 
          builder.Services.Configure<BingMapsOptions>(builder.Configuration.GetSection("BingMaps"));
-
+         builder.Services.Configure<OpenWeatherMapOptions>(builder.Configuration.GetSection("OpenWeatherMap"));
 
          ConfigureServices(builder.Services);
 
          builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly, typeof(InfraMapperProfile).Assembly);
          builder.Services.AddMemoryCache();
 
-         builder.Services.AddHttpClient<IGeocodeService, BingMapsLocationsService>(client =>
-         {
-            client.BaseAddress = new Uri(builder.Configuration["BingMaps:BaseAddress"]);
-         });
-
-         builder.Services.AddHttpClient<IForecastService, NationalWeatherService>(client =>
-         {
-            client.BaseAddress = new Uri("https://api.weather.gov");
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("WeatherForecastAggregator");
-         });
+         AddNamedHttpClients(builder);
 
          builder.Services.AddControllers();
          // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,10 +47,30 @@ namespace WeatherForecastAggregator
          app.Run();
       }
 
-      static void ConfigureServices(IServiceCollection services)
+      private static void AddNamedHttpClients(WebApplicationBuilder builder)
+      {
+         builder.Services.AddHttpClient<IGeocodeService, BingMapsLocationsService>(client =>
+         {
+            client.BaseAddress = new Uri(builder.Configuration["BingMaps:BaseAddress"]);
+         });
+
+         builder.Services.AddHttpClient(nameof(NationalWeatherService), client =>
+         {
+            client.BaseAddress = new Uri("https://api.weather.gov");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("WeatherForecastAggregator");
+         });
+
+         builder.Services.AddHttpClient(nameof(OpenWeatherMapService), client =>
+         {
+            client.BaseAddress = new Uri("https://api.openweathermap.org");
+         });
+      }
+
+      private static void ConfigureServices(IServiceCollection services)
       {
          services.AddSingleton<IWeatherAggregatorService, WeatherAggregatorService>();
-         //services.AddSingleton<IForecastService, NationalWeatherService>();
+         services.AddTransient<IForecastService, NationalWeatherService>();
+         services.AddTransient<IForecastService, OpenWeatherMapService>();
       }
    }
 }

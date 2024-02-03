@@ -7,9 +7,9 @@ public class NationalWeatherService : IForecastService
    private readonly HttpClient _httpClient;
    private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-   public NationalWeatherService(HttpClient httpClient)
+   public NationalWeatherService(IHttpClientFactory httpClientFactory)
    {
-      _httpClient = httpClient;
+      _httpClient = httpClientFactory.CreateClient(nameof(NationalWeatherService));
 
       _jsonSerializerOptions = new JsonSerializerOptions
       {
@@ -47,7 +47,7 @@ public class NationalWeatherService : IForecastService
 
       var responseContent = await response.Content.ReadAsStreamAsync();
 
-      var dto =  await JsonSerializer.DeserializeAsync<PointResponseDto>(responseContent, _jsonSerializerOptions);
+      var dto = await JsonSerializer.DeserializeAsync<PointResponseDto>(responseContent, _jsonSerializerOptions);
       return dto;
    }
 }
