@@ -1,8 +1,4 @@
 ﻿namespace WeatherForecastAggregator.Domain.Models
 {
-   public class Coordinates
-   {
-      public double Latitude { get; set; }
-      public double Longitude { get; set; }
-   }
+   public record Coordinates(double Latitude, double Longitude);
 }

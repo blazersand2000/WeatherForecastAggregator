@@ -2,8 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using WeatherForecastAggregator.App.Mappings;
 using WeatherForecastAggregator.App.Services;
 using WeatherForecastAggregator.Domain.Interfaces;
+using WeatherForecastAggregator.Infrastructure.Interfaces;
 using WeatherForecastAggregator.Infrastructure.Options;
-using WeatherForecastAggregator.Infrastructure.Services.Geocoding;
+using WeatherForecastAggregator.Infrastructure.Services.APIs.Geocoding;
 
 namespace WeatherForecastAggregator
 {
@@ -68,7 +69,9 @@ namespace WeatherForecastAggregator
 
       private static void ConfigureServices(IServiceCollection services)
       {
-         services.AddSingleton<IWeatherAggregatorService, WeatherAggregatorService>();
+         services.AddSingleton<IWeatherService, WeatherService>();
+         services.AddSingleton<IForecastAggregatorService, ForecastAggregatorService>();
+         services.AddSingleton<ILocationService, LocationService>();
          services.AddTransient<IForecastService, NationalWeatherService>();
          services.AddTransient<IForecastService, OpenWeatherMapService>();
       }

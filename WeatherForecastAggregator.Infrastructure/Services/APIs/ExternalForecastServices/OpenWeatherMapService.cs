@@ -2,6 +2,7 @@
 using System.Text.Json;
 using WeatherForecastAggregator.Domain.Models;
 using WeatherForecastAggregator.Infrastructure.DTOs.OpenWeatherMap;
+using WeatherForecastAggregator.Infrastructure.Interfaces;
 using WeatherForecastAggregator.Infrastructure.Options;
 
 public class OpenWeatherMapService : IForecastService
@@ -21,7 +22,7 @@ public class OpenWeatherMapService : IForecastService
       };
    }
 
-   public async Task<string> GetForecast(Coordinates point)
+   public async Task<ForecastSource> GetForecast(Coordinates point)
    {
       var response = await _httpClient.GetAsync($"/data/2.5/forecast?lat={point.Latitude}&lon={point.Longitude}&appid={_openWeatherMapOptions.ApiKey}&units=imperial");
 
@@ -34,7 +35,18 @@ public class OpenWeatherMapService : IForecastService
       var temp = p1.Main.Temp;
       var time = DateTimeOffset.FromUnixTimeSeconds(p1.Dt).DateTime;
       var conditions = p1.Weather[0].Description;
-      var forecast = $"{time}: {temp}F and {conditions}.";
+      var forecast = new ForecastSource
+      {
+         Name = "OpenWeatherMap",
+         CurrentTemperatureF = temp, // assuming `temp` is a float representing the current temperature
+         Attribution = new AttributionNode
+         {
+            Text = "Attribution Text", // replace with actual text
+            Url = "https://example.com/attribution", // replace with actual URL
+            LogoUrl = "https://example.com/logo.png" // replace with actual URL or null if not applicable
+         }
+      };
+
       return forecast;
    }
 }

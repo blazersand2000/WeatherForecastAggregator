@@ -10,11 +10,11 @@ namespace WeatherForecastAggregator.Controllers
    [Route("api/[controller]")]
    public class WeatherForecastController : ControllerBase
    {
-      private readonly IWeatherAggregatorService _forecastService;
+      private readonly IWeatherService _forecastService;
       private readonly IMapper _mapper;
       private readonly ILogger<WeatherForecastController> _logger;
 
-      public WeatherForecastController(IWeatherAggregatorService forecastService, IMapper mapper, ILogger<WeatherForecastController> logger)
+      public WeatherForecastController(IWeatherService forecastService, IMapper mapper, ILogger<WeatherForecastController> logger)
       {
          _forecastService = forecastService;
          _mapper = mapper;
@@ -22,14 +22,14 @@ namespace WeatherForecastAggregator.Controllers
       }
 
       [HttpGet]
-      public async Task<AggregatedForecastDto> Get(string location)
+      public async Task<ForecastsResponseDto> Get(string location)
       {
          var requestDto = new ForecastsRequestDto { Location = location };
          var request = _mapper.Map<ForecastsRequest>(requestDto);
 
          var forecasts = await _forecastService.GetForecasts(request);
 
-         var responseDto = _mapper.Map<AggregatedForecastDto>(forecasts);
+         var responseDto = _mapper.Map<ForecastsResponseDto>(forecasts);
 
          return responseDto;
       }

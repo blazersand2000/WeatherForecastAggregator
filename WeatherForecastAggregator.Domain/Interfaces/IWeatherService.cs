@@ -3,8 +3,8 @@ using WeatherForecastAggregator.Domain.Models;
 
 namespace WeatherForecastAggregator.Domain.Interfaces
 {
-   public interface IGeocodeService
+   public interface IWeatherService
    {
-      Task<Location?> Geocode(string location);
+      Task<ForecastsResponse?> GetForecasts(ForecastsRequest request);
    }
 }

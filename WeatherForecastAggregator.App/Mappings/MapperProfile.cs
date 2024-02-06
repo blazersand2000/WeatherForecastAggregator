@@ -9,8 +9,7 @@ namespace WeatherForecastAggregator.App.Mappings
       public MapperProfile()
       {
          CreateMap<ForecastsRequest, ForecastsRequestDto>().ReverseMap();
-         CreateMap<AggregatedForecast, AggregatedForecastDto>().ReverseMap();
-         CreateMap<ForecastSource, ForecastSourceDto>().ReverseMap();
+         CreateMap<ForecastsResponse, ForecastsResponseDto>().ReverseMap();
       }
    }
 }

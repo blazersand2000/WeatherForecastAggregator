@@ -1,8 +1,6 @@
-﻿namespace WeatherForecastAggregator.Domain.Models
+﻿using System;
+
+namespace WeatherForecastAggregator.Domain.Models
 {
-   public class Location
-   {
-      public string Name { get; set; }
-      public Coordinates Coordinates { get; set; }
-   }
+   public record Location(string Name, Coordinates Coordinates, TimeZoneInfo TimeZone);
 }

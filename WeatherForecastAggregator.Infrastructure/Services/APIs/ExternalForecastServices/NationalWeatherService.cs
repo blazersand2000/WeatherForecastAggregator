@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using WeatherForecastAggregator.Domain.Models;
 using WeatherForecastAggregator.Infrastructure.DTOs.NWS;
+using WeatherForecastAggregator.Infrastructure.Interfaces;
 
 public class NationalWeatherService : IForecastService
 {
@@ -17,7 +18,7 @@ public class NationalWeatherService : IForecastService
       };
    }
 
-   public async Task<string> GetForecast(Coordinates point)
+   public async Task<ForecastSource> GetForecast(Coordinates point)
    {
       var pointResponse = await GetPointData(point);
 
@@ -35,7 +36,18 @@ public class NationalWeatherService : IForecastService
 
       var p1 = dto.Properties.Periods[0];
       var p2 = dto.Properties.Periods[1];
-      var forecast = $"{p1.Name}: {p1.ShortForecast}, {p1.Temperature}{p1.TemperatureUnit}. {p2.Name}: {p2.ShortForecast}, {p2.Temperature}{p2.TemperatureUnit}. ";
+      var forecast = new ForecastSource
+      {
+         Name = "National Weather Service",
+         CurrentTemperatureF = p1.Temperature,
+         Attribution = new AttributionNode
+         {
+            Text = "NWS Attribution Text", // replace with actual text
+            Url = "https://example.com/attribution", // replace with actual URL
+            LogoUrl = "https://example.com/logo.png" // replace with actual URL or null if not applicable
+         }
+      };
+
       return forecast;
    }
 
