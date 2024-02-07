@@ -26,6 +26,38 @@ public class NationalWeatherService : IForecastService
       var x = pointResponse.Properties.GridX;
       var y = pointResponse.Properties.GridY;
 
+      return await GetHourlyForecast(wfo, x, y);
+   }
+
+   private async Task<ForecastSource> GetHourlyForecast(string wfo, int x, int y)
+   {
+      var response = await _httpClient.GetAsync($"/gridpoints/{wfo}/{x},{y}/forecast/hourly?units=us");
+
+      response.EnsureSuccessStatusCode();
+
+      var responseContent = await response.Content.ReadAsStreamAsync();
+
+      var dto = await JsonSerializer.DeserializeAsync<ForecastResponseHourlyDto>(responseContent, _jsonSerializerOptions);
+
+      var p1 = dto.Properties.Periods[0];
+      var p2 = dto.Properties.Periods[1];
+      var forecast = new ForecastSource
+      {
+         Name = "National Weather Service",
+         CurrentTemperatureF = p1.Temperature,
+         Attribution = new AttributionNode
+         {
+            Text = "NWS Attribution Text", // replace with actual text
+            Url = "https://example.com/attribution", // replace with actual URL
+            LogoUrl = "https://example.com/logo.png" // replace with actual URL or null if not applicable
+         }
+      };
+
+      return forecast;
+   }
+
+   private async Task<ForecastSource> GetTwicePerDayForecast(string wfo, int x, int y)
+   {
       var response = await _httpClient.GetAsync($"/gridpoints/{wfo}/{x},{y}/forecast?units=us");
 
       response.EnsureSuccessStatusCode();
