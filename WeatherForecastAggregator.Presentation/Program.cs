@@ -69,7 +69,6 @@ namespace WeatherForecastAggregator
 
       private static void ConfigureServices(IServiceCollection services)
       {
-         services.AddSingleton<IWeatherService, WeatherService>();
          services.AddSingleton<IForecastAggregatorService, ForecastAggregatorService>();
          services.AddSingleton<ILocationService, LocationService>();
          services.AddTransient<IForecastService, NationalWeatherService>();

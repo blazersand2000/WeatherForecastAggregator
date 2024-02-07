@@ -14,13 +14,19 @@ namespace WeatherForecastAggregator.App.Services
          _forecastServices = forecastServices;
       }
 
-      public async Task<AggregatedForecast> GetAggregatedForecast(Coordinates point)
+      public async Task<ForecastsResponse?> GetForecasts(ForecastsRequest request)
       {
-         var forecasts = await Task.WhenAll(_forecastServices.Select(s => s.GetForecast(point)));
-         return new AggregatedForecast
+         var forecasts = await Task.WhenAll(_forecastServices.Select(s => s.GetForecast(request.Coordinates)));
+         if (forecasts == null)
+         {
+            return null;
+         }
+         var response = new ForecastsResponse
          {
             Sources = forecasts
          };
+
+         return response;
       }
    }
 }

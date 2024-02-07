@@ -10,6 +10,7 @@ namespace WeatherForecastAggregator.App.Mappings
       {
          CreateMap<ForecastsRequest, ForecastsRequestDto>().ReverseMap();
          CreateMap<ForecastsResponse, ForecastsResponseDto>().ReverseMap();
+         CreateMap<Location, LocationResponseDto>().ReverseMap();
       }
    }
 }

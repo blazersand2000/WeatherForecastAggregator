@@ -5,5 +5,5 @@ namespace WeatherForecastAggregator.Domain.Interfaces;
 
 public interface IForecastAggregatorService
 {
-   Task<AggregatedForecast> GetAggregatedForecast(Coordinates point);
+   Task<ForecastsResponse?> GetForecasts(ForecastsRequest request);
 }

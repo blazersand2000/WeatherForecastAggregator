@@ -14,21 +14,25 @@ namespace WeatherForecastAggregator.App.Services
 
       public async Task<Location?> GetLocation(string location)
       {
-         var geoLocation = (await _geocodeService.Geocode(location))?.ResourceSets[0]?.Resources[0];
-         if (geoLocation == null)
+         var geoLocationDto = await _geocodeService.Geocode(location);
+         if (geoLocationDto?.ResourceSets == null || !geoLocationDto.ResourceSets.Any() ||
+             geoLocationDto.ResourceSets[0]?.Resources == null || !geoLocationDto.ResourceSets[0].Resources.Any())
          {
             return null;
          }
+
+         var geoLocation = geoLocationDto.ResourceSets[0].Resources[0];
 
          var (lat, lon) = (geoLocation.Point.Coordinates[0], geoLocation.Point.Coordinates[1]);
-         var timeZone = (await _geocodeService.GetTimeZoneInfo(lat, lon))?.ResourceSets[0]?.Resources[0];
-         if (timeZone == null)
+         var timeZoneDto = await _geocodeService.GetTimeZoneInfo(lat, lon);
+         if (timeZoneDto?.ResourceSets == null || !timeZoneDto.ResourceSets.Any() ||
+             timeZoneDto.ResourceSets[0]?.Resources == null || !timeZoneDto.ResourceSets[0].Resources.Any())
          {
             return null;
          }
 
-         var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone?.TimeZone.WindowsTimeZoneId ?? "UTC");
-
+         var timeZone = timeZoneDto.ResourceSets[0].Resources[0];
+         var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone.TimeZone.WindowsTimeZoneId ?? "UTC") ?? TimeZoneInfo.Utc;
          return new Location(geoLocation.Name, new Coordinates(lat, lon), timeZoneInfo);
       }
    }

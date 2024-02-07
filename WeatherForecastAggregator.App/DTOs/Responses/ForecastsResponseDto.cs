@@ -2,7 +2,7 @@
 {
    public class ForecastsResponseDto
    {
-      public AggregatedForecast AggregatedForecast { get; set; }
-      public string LocationName { get; set; }
+      public IEnumerable<ForecastSource> Sources { get; set; }
+      //public string LocationName { get; set; }
    }
 }

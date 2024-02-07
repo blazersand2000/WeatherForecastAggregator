@@ -1,7 +1,9 @@
+using WeatherForecastAggregator.Domain.Models;
+
 namespace WeatherForecastAggregator.App.DTOs.Requests
 {
    public class ForecastsRequestDto
    {
-      public string Location { get; set; }
+      public Coordinates Coordinates { get; set; }
    }
 }
