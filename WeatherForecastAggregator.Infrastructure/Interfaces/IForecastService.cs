@@ -5,6 +5,6 @@ namespace WeatherForecastAggregator.Infrastructure.Interfaces
 {
    public interface IForecastService
    {
-      Task<ForecastSource> GetForecast(Coordinates point);
+      Task<ForecastSource> GetForecast(Coordinates point, TimeZoneInfo timeZoneInfo);
    }
 }

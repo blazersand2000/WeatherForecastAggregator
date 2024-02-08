@@ -7,16 +7,19 @@ namespace WeatherForecastAggregator.App.Services
 {
    public class ForecastAggregatorService : IForecastAggregatorService
    {
+      private readonly ILocationService _locationService;
       private readonly IEnumerable<IForecastService> _forecastServices;
 
-      public ForecastAggregatorService(IEnumerable<IForecastService> forecastServices)
+      public ForecastAggregatorService(ILocationService locationService, IEnumerable<IForecastService> forecastServices)
       {
+         _locationService = locationService;
          _forecastServices = forecastServices;
       }
 
       public async Task<ForecastsResponse?> GetForecasts(ForecastsRequest request)
       {
-         var forecasts = await Task.WhenAll(_forecastServices.Select(s => s.GetForecast(request.Coordinates)));
+         var timeZoneInfo = await _locationService.GetTimeZoneInfo(request.Coordinates.Latitude, request.Coordinates.Longitude) ?? TimeZoneInfo.Utc;
+         var forecasts = await Task.WhenAll(_forecastServices.Select(s => s.GetForecast(request.Coordinates, timeZoneInfo)));
          if (forecasts == null)
          {
             return null;

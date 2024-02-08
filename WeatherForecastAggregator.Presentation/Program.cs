@@ -40,6 +40,8 @@ namespace WeatherForecastAggregator
 
          app.UseHttpsRedirection();
 
+         app.UseStaticFiles();
+
          app.UseAuthorization();
 
 

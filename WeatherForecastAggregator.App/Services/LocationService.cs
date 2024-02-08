@@ -24,6 +24,17 @@ namespace WeatherForecastAggregator.App.Services
          var geoLocation = geoLocationDto.ResourceSets[0].Resources[0];
 
          var (lat, lon) = (geoLocation.Point.Coordinates[0], geoLocation.Point.Coordinates[1]);
+         var timeZoneInfo = await GetTimeZoneInfo(lat, lon);
+         if (timeZoneInfo == null)
+         {
+            return null;
+         }
+
+         return new Location(geoLocation.Name, new Coordinates(lat, lon), timeZoneInfo);
+      }
+
+      public async Task<TimeZoneInfo?> GetTimeZoneInfo(double lat, double lon)
+      {
          var timeZoneDto = await _geocodeService.GetTimeZoneInfo(lat, lon);
          if (timeZoneDto?.ResourceSets == null || !timeZoneDto.ResourceSets.Any() ||
              timeZoneDto.ResourceSets[0]?.Resources == null || !timeZoneDto.ResourceSets[0].Resources.Any())
@@ -33,7 +44,7 @@ namespace WeatherForecastAggregator.App.Services
 
          var timeZone = timeZoneDto.ResourceSets[0].Resources[0];
          var timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZone.TimeZone.WindowsTimeZoneId ?? "UTC") ?? TimeZoneInfo.Utc;
-         return new Location(geoLocation.Name, new Coordinates(lat, lon), timeZoneInfo);
+         return timeZoneInfo;
       }
    }
 }

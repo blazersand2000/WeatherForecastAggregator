@@ -18,7 +18,7 @@ public class NationalWeatherService : IForecastService
       };
    }
 
-   public async Task<ForecastSource> GetForecast(Coordinates point)
+   public async Task<ForecastSource> GetForecast(Coordinates point, TimeZoneInfo timeZoneInfo)
    {
       var pointResponse = await GetPointData(point);
 
@@ -26,10 +26,10 @@ public class NationalWeatherService : IForecastService
       var x = pointResponse.Properties.GridX;
       var y = pointResponse.Properties.GridY;
 
-      return await GetHourlyForecast(wfo, x, y);
+      return await GetHourlyForecast(wfo, x, y, timeZoneInfo);
    }
 
-   private async Task<ForecastSource> GetHourlyForecast(string wfo, int x, int y)
+   private async Task<ForecastSource> GetHourlyForecast(string wfo, int x, int y, TimeZoneInfo timeZoneInfo)
    {
       var response = await _httpClient.GetAsync($"/gridpoints/{wfo}/{x},{y}/forecast/hourly?units=us");
 
@@ -39,18 +39,27 @@ public class NationalWeatherService : IForecastService
 
       var dto = await JsonSerializer.DeserializeAsync<ForecastResponseHourlyDto>(responseContent, _jsonSerializerOptions);
 
-      var p1 = dto.Properties.Periods[0];
-      var p2 = dto.Properties.Periods[1];
+      var periodsGroupedByDay = dto.Properties.Periods.GroupBy(p => p.StartTime.Date);
+      var dailyForecasts = periodsGroupedByDay.Select(g => new DailyForecast
+      {
+         Date = g.Key.ToString("yyyy-MM-dd"),
+         HighTemperatureF = g.Max(p => p.Temperature),
+         LowTemperatureF = g.Min(p => p.Temperature),
+         ShortForecast = string.Join(", ", g.Select(p => p.ShortForecast).Distinct()),
+         ProbabilityOfPrecipitation = g.Max(p => p.ProbabilityOfPrecipitation.Value / 100f),
+         WindSpeed = g.Max(p => int.Parse(p.WindSpeed.Split(' ')[0]))
+      });
+
       var forecast = new ForecastSource
       {
          Name = "National Weather Service",
-         CurrentTemperatureF = p1.Temperature,
          Attribution = new AttributionNode
          {
-            Text = "NWS Attribution Text", // replace with actual text
-            Url = "https://example.com/attribution", // replace with actual URL
-            LogoUrl = "https://example.com/logo.png" // replace with actual URL or null if not applicable
-         }
+            Text = "National Weather Service",
+            Url = "https://www.weather.gov/documentation/services-web-api",
+            LogoUrl = ""
+         },
+         DailyForecasts = dailyForecasts.ToList()
       };
 
       return forecast;
@@ -71,7 +80,6 @@ public class NationalWeatherService : IForecastService
       var forecast = new ForecastSource
       {
          Name = "National Weather Service",
-         CurrentTemperatureF = p1.Temperature,
          Attribution = new AttributionNode
          {
             Text = "NWS Attribution Text", // replace with actual text
