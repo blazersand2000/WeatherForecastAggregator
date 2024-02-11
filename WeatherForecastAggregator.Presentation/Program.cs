@@ -30,6 +30,17 @@ namespace WeatherForecastAggregator
          builder.Services.AddEndpointsApiExplorer();
          builder.Services.AddSwaggerGen();
 
+         builder.Services.AddCors(options =>
+         {
+            options.AddPolicy("AllowVueApp",
+                builder =>
+                {
+                   builder.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+                });
+         });
+
          var app = builder.Build();
 
          // Configure the HTTP request pipeline.
@@ -40,6 +51,8 @@ namespace WeatherForecastAggregator
          }
 
          app.UseHttpsRedirection();
+
+         app.UseCors("AllowVueApp");
 
          app.UseStaticFiles();
 
