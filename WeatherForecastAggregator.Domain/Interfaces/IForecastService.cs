@@ -1,7 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using WeatherForecastAggregator.Domain.Models;
 
-namespace WeatherForecastAggregator.Infrastructure.Interfaces
+namespace WeatherForecastAggregator.Domain.Interfaces
 {
    public interface IForecastService
    {

@@ -7,7 +7,7 @@ using WeatherForecastAggregator.Infrastructure.DTOs.BingMaps;
 
 namespace WeatherForecastAggregator.Infrastructure.Services.APIs.Geocoding
 {
-   public class BingMapsLocationsService : IGeocodeService
+   public class BingMapsLocationsApi : IGeocodeService
    {
       private readonly HttpClient _httpClient;
       private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -15,7 +15,7 @@ namespace WeatherForecastAggregator.Infrastructure.Services.APIs.Geocoding
       private readonly IMapper _mapper;
       private readonly BingMapsOptions _bingMapsOptions;
 
-      public BingMapsLocationsService(HttpClient httpClient, IMemoryCache cache, IMapper mapper, IOptions<BingMapsOptions> bingMapsOptions)
+      public BingMapsLocationsApi(HttpClient httpClient, IMemoryCache cache, IMapper mapper, IOptions<BingMapsOptions> bingMapsOptions)
       {
          _httpClient = httpClient;
          _cache = cache;

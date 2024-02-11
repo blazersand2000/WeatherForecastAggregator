@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using WeatherForecastAggregator.App.Mappings;
 using WeatherForecastAggregator.App.Services;
+using WeatherForecastAggregator.App.Services.Forecasts;
 using WeatherForecastAggregator.Domain.Interfaces;
 using WeatherForecastAggregator.Infrastructure.Interfaces;
 using WeatherForecastAggregator.Infrastructure.Options;
@@ -52,18 +53,18 @@ namespace WeatherForecastAggregator
 
       private static void AddNamedHttpClients(WebApplicationBuilder builder)
       {
-         builder.Services.AddHttpClient<IGeocodeService, BingMapsLocationsService>(client =>
+         builder.Services.AddHttpClient<IGeocodeService, BingMapsLocationsApi>(client =>
          {
             client.BaseAddress = new Uri(builder.Configuration["BingMaps:BaseAddress"]);
          });
 
-         builder.Services.AddHttpClient(nameof(NationalWeatherService), client =>
+         builder.Services.AddHttpClient<INationalWeatherServiceDataProvider, NationalWeatherServiceApi>(client =>
          {
             client.BaseAddress = new Uri("https://api.weather.gov");
             client.DefaultRequestHeaders.UserAgent.ParseAdd("WeatherForecastAggregator");
          });
 
-         builder.Services.AddHttpClient(nameof(OpenWeatherMapService), client =>
+         builder.Services.AddHttpClient<IOpenWeatherMapDataProvider, OpenWeatherMapApi>(client =>
          {
             client.BaseAddress = new Uri("https://api.openweathermap.org");
          });
@@ -73,8 +74,8 @@ namespace WeatherForecastAggregator
       {
          services.AddSingleton<IForecastAggregatorService, ForecastAggregatorService>();
          services.AddSingleton<ILocationService, LocationService>();
-         services.AddTransient<IForecastService, NationalWeatherService>();
-         services.AddTransient<IForecastService, OpenWeatherMapService>();
+         services.AddSingleton<IForecastService, NationalWeatherService>();
+         services.AddSingleton<IForecastService, OpenWeatherMapService>();
       }
    }
 }

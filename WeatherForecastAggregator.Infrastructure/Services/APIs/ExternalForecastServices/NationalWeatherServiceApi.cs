@@ -3,14 +3,14 @@ using WeatherForecastAggregator.Domain.Models;
 using WeatherForecastAggregator.Infrastructure.DTOs.NWS;
 using WeatherForecastAggregator.Infrastructure.Interfaces;
 
-public class NationalWeatherService : IForecastService
+public class NationalWeatherServiceApi : INationalWeatherServiceDataProvider
 {
    private readonly HttpClient _httpClient;
    private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-   public NationalWeatherService(IHttpClientFactory httpClientFactory)
+   public NationalWeatherServiceApi(HttpClient httpClient)
    {
-      _httpClient = httpClientFactory.CreateClient(nameof(NationalWeatherService));
+      _httpClient = httpClient;
 
       _jsonSerializerOptions = new JsonSerializerOptions
       {
@@ -18,7 +18,7 @@ public class NationalWeatherService : IForecastService
       };
    }
 
-   public async Task<ForecastSource> GetForecast(Coordinates point, TimeZoneInfo timeZoneInfo)
+   public async Task<ForecastResponseHourlyDto> GetForecast(Coordinates point, TimeZoneInfo timeZoneInfo)
    {
       var pointResponse = await GetPointData(point);
 
@@ -29,7 +29,7 @@ public class NationalWeatherService : IForecastService
       return await GetHourlyForecast(wfo, x, y, timeZoneInfo);
    }
 
-   private async Task<ForecastSource> GetHourlyForecast(string wfo, int x, int y, TimeZoneInfo timeZoneInfo)
+   private async Task<ForecastResponseHourlyDto> GetHourlyForecast(string wfo, int x, int y, TimeZoneInfo timeZoneInfo)
    {
       var response = await _httpClient.GetAsync($"/gridpoints/{wfo}/{x},{y}/forecast/hourly?units=us");
 
@@ -39,30 +39,7 @@ public class NationalWeatherService : IForecastService
 
       var dto = await JsonSerializer.DeserializeAsync<ForecastResponseHourlyDto>(responseContent, _jsonSerializerOptions);
 
-      var periodsGroupedByDay = dto.Properties.Periods.GroupBy(p => p.StartTime.Date);
-      var dailyForecasts = periodsGroupedByDay.Select(g => new DailyForecast
-      {
-         Date = g.Key.ToString("yyyy-MM-dd"),
-         HighTemperatureF = g.Max(p => p.Temperature),
-         LowTemperatureF = g.Min(p => p.Temperature),
-         ShortForecast = string.Join(", ", g.Select(p => p.ShortForecast).Distinct()),
-         ProbabilityOfPrecipitation = g.Max(p => p.ProbabilityOfPrecipitation.Value / 100f),
-         WindSpeed = g.Max(p => int.Parse(p.WindSpeed.Split(' ')[0]))
-      });
-
-      var forecast = new ForecastSource
-      {
-         Name = "National Weather Service",
-         Attribution = new AttributionNode
-         {
-            Text = "National Weather Service",
-            Url = "https://www.weather.gov/documentation/services-web-api",
-            LogoUrl = ""
-         },
-         DailyForecasts = dailyForecasts.ToList()
-      };
-
-      return forecast;
+      return dto;
    }
 
    private async Task<ForecastSource> GetTwicePerDayForecast(string wfo, int x, int y)

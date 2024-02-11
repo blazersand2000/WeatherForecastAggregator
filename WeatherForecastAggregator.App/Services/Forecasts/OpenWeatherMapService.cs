@@ -1,36 +1,21 @@
-﻿using Microsoft.Extensions.Options;
-using System.Text.Json;
+﻿using WeatherForecastAggregator.Domain.Interfaces;
 using WeatherForecastAggregator.Domain.Models;
-using WeatherForecastAggregator.Infrastructure.DTOs.OpenWeatherMap;
 using WeatherForecastAggregator.Infrastructure.Interfaces;
-using WeatherForecastAggregator.Infrastructure.Options;
+
+namespace WeatherForecastAggregator.App.Services.Forecasts;
 
 public class OpenWeatherMapService : IForecastService
 {
-   private readonly HttpClient _httpClient;
-   private readonly OpenWeatherMapOptions _openWeatherMapOptions;
-   private readonly JsonSerializerOptions _jsonSerializerOptions;
+   private readonly IOpenWeatherMapDataProvider _dataProvider;
 
-   public OpenWeatherMapService(IHttpClientFactory httpClientFactory, IOptions<OpenWeatherMapOptions> openWeatherMapOptions)
+   public OpenWeatherMapService(IOpenWeatherMapDataProvider dataProvider)
    {
-      _httpClient = httpClientFactory.CreateClient(nameof(OpenWeatherMapService));
-      _openWeatherMapOptions = openWeatherMapOptions.Value;
-
-      _jsonSerializerOptions = new JsonSerializerOptions
-      {
-         PropertyNameCaseInsensitive = true,
-      };
+      _dataProvider = dataProvider;
    }
 
    public async Task<ForecastSource> GetForecast(Coordinates point, TimeZoneInfo timeZoneInfo)
    {
-      var response = await _httpClient.GetAsync($"/data/2.5/forecast?lat={point.Latitude}&lon={point.Longitude}&appid={_openWeatherMapOptions.ApiKey}&units=imperial");
-
-      response.EnsureSuccessStatusCode();
-
-      var responseContent = await response.Content.ReadAsStreamAsync();
-
-      var dto = await JsonSerializer.DeserializeAsync<ForecastResponseDto>(responseContent, _jsonSerializerOptions);
+      var dto = await _dataProvider.GetForecast(point, timeZoneInfo);
 
       var periodsGroupedByDay = dto.List
          .GroupBy(p => TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(p.Dt).UtcDateTime, timeZoneInfo).Date);
