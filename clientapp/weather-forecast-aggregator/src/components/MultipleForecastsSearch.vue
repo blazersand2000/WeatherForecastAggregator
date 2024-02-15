@@ -1,38 +1,50 @@
 <template>
-  <v-row>
-    <v-col>
-      <v-form @submit.prevent="search">
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field v-model="searchTerm" label="Search" required></v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-btn type="submit" color="primary">Search</v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
-    </v-col>
-  </v-row>
-  <v-row>
-    <v-col>
-      <v-progress-circular v-if="isFetching" indeterminate></v-progress-circular>
-      <v-alert v-if="error" type="error">{{ error }}</v-alert>
-      <AggregatedForecasts v-if="forecasts" :forecasts="forecasts" />
-    </v-col>
-  </v-row>
+  <v-container fluid style="max-width: 1400px">
+    <v-row justify="center">
+      <v-col style="max-width: 500px">
+        <v-form @submit.prevent="search">
+          <v-row>
+            <v-col>
+              <v-text-field
+                autofocus
+                v-model="searchTerm"
+                :disabled="isFetching"
+                :loading="isFetching"
+                label="Search"
+                hint="Search any place in the United States"
+                variant="solo"
+                single-line
+                clearable
+                append-icon="mdi-magnify"
+                @click:append="search"
+                @focus="$event.target.select()"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-form>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-alert v-if="error" type="error">{{ error }}</v-alert>
+        <AggregatedForecasts v-if="forecasts" :forecasts="forecasts" />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useWeatherApi } from '@/composables/useWeatherApi'
 import AggregatedForecasts from '@/components/AggregatedForecasts.vue'
 
-const baseUrl = 'https://localhost:7004/api/WeatherForecast'
-
 const searchTerm = ref('')
-const { isFetching, error, forecasts, getForecasts } = useWeatherApi()
+const { isFetching, error, location, forecasts, getForecasts } = useWeatherApi()
 
 const search = async () => {
   await getForecasts(searchTerm.value)
+  if (location.value) {
+    searchTerm.value = location.value.name
+  }
 }
 </script>

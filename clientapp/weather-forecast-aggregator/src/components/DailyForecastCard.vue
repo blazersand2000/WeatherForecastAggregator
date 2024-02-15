@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card variant="tonal" color="primary">
     <v-row align="center">
       <v-col>
         <v-card-title>

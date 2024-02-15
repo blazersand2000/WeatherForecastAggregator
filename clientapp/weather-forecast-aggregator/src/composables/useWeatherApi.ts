@@ -7,6 +7,7 @@ const baseUrl = 'https://localhost:7004/api/WeatherForecast'
 export function useWeatherApi() {
   const isFetching = ref(false)
   const error = ref('')
+  const location = ref<LocationResponse | null>(null)
   const forecasts = ref<ForecastsResponse | null>(null)
 
   const getForecasts = async (searchTerm: string) => {
@@ -19,6 +20,7 @@ export function useWeatherApi() {
         return
       }
       const locationData: LocationResponse = await locationResponse.json()
+      location.value = locationData
       const forecastsResponse = await fetch(
         `${baseUrl}/forecasts?lat=${locationData.coordinates.latitude}&lon=${locationData.coordinates.longitude}`
       )
@@ -35,5 +37,5 @@ export function useWeatherApi() {
     }
   }
 
-  return { isFetching, error, forecasts, getForecasts }
+  return { isFetching, error, location, forecasts, getForecasts }
 }
