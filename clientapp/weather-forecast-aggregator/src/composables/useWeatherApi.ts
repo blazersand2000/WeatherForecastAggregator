@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import type { ForecastsResponse } from '@/types/ForecastsResponse'
 import type { LocationResponse } from '@/types/LocationResponse'
 
-const baseUrl = 'https://localhost:7004/api/WeatherForecast'
+const baseUrl = `${import.meta.env.VITE_APP_API_BASE_URL}/api/WeatherForecast`
 
 export function useWeatherApi() {
   const isFetching = ref(false)
