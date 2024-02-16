@@ -29,8 +29,9 @@ jobs:
 
          - name: Move built files to wwwroot
            run: |
-              mkdir -p ./WeatherForecastAggregator.Presentation/wwwroot
+              New-Item -ItemType Directory -Path ./WeatherForecastAggregator.Presentation/wwwroot -Force
               cp -r ./clientapp/weather-forecast-aggregator/dist/* ./WeatherForecastAggregator.Presentation/wwwroot
+           shell: pwsh
 
          - name: Set up .NET Core
            uses: actions/setup-dotnet@v1
