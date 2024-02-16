@@ -56,8 +56,12 @@ namespace WeatherForecastAggregator
 
          app.UseStaticFiles();
 
-         app.UseAuthorization();
+         app.UseSpa(spa =>
+         {
+            spa.Options.SourcePath = "wwwroot";
+         });
 
+         app.UseAuthorization();
 
          app.MapControllers();
 

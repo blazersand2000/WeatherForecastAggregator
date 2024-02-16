@@ -31,7 +31,7 @@ export function useWeatherApi() {
       const forecastData: ForecastsResponse = await forecastsResponse.json()
       forecasts.value = forecastData
     } catch (e) {
-      error.value = 'Error: ' + e.message
+      error.value = 'Error: ' //+ e.message
     } finally {
       isFetching.value = false
     }
